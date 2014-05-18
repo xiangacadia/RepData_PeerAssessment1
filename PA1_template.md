@@ -47,11 +47,81 @@ median(steps, na.rm = TRUE)
 
 
 ## What is the average daily activity pattern?
+Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+```r
+timeseries <- tapply(data$steps, data$interval, mean, na.rm = TRUE)
+dftimeseries <- data.frame(names(timeseries), timeseries, row.names = NULL)
+names(dftimeseries) <- c("interval", "stepnum")
+plot(data$interval[1:288], dftimeseries$stepnum, type = "l")
+```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
 
 
+Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+The max number of steps are:
+
+```r
+max(dftimeseries$stepnum)
+```
+
+```
+## [1] 206.2
+```
+
+The interval for the max steps are:
+
+```r
+a <- which.max(dftimeseries$stepnum)
+names(a)
+```
+
+```
+## [1] "835"
+```
 
 ## Imputing missing values
+Calculate and report the total number of missing values in the dataset
+The total number of missing values are:
+
+```r
+length(data$steps[is.na(data$steps)])
+```
+
+```
+## [1] 2304
+```
 
 
+Devise a strategy for filling in all of the missing values in the dataset.
+Replace missing value with mean steps per interval.
 
+```r
+## replace missing value with mean steps per interval
+data$steps[is.na(data$steps)] <- dftimeseries$stepnum[as.character(data$interval[is.na(data$steps)])]
+```
+
+Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+```r
+newdata <- data
+```
+
+Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
+
+```r
+## Using tapply to calculate sum steps per day
+steps <- tapply(newdata$steps, data$date, sum)
+dfsteps <- data.frame(names(steps), steps, row.names = NULL)
+names(dfsteps) <- c("date", "stepnum")
+## Using qplot to plot histogram
+qplot(stepnum, data = dfsteps, geom = "histogram", binwidth = 300)
+```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11.png) 
+
+These values differ from the estimates from the first part of the assignment.
+Imputing missing data helps filling in the missing values which are treated to be 0 previously,
+it helps get a more accurate total daily number of steps.
 ## Are there differences in activity patterns between weekdays and weekends?
