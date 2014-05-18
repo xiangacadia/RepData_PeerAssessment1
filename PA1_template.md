@@ -122,6 +122,27 @@ qplot(stepnum, data = dfsteps, geom = "histogram", binwidth = 300)
 ![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11.png) 
 
 These values differ from the estimates from the first part of the assignment.
-Imputing missing data helps filling in the missing values which are treated to be 0 previously,
+Imputing missing data helps fill in the missing values which are treated to be 0 previously,
 it helps get a more accurate total daily number of steps.
 ## Are there differences in activity patterns between weekdays and weekends?
+Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+
+```r
+## create factor variable *days* for weekends and weekdays
+days <- weekdays(as.Date(as.character(newdata$date)))
+weekends <- (days == "Sunday" | days == "Saturday")
+days[weekends] <- "weekend"
+days[!weekends] <- "weekday"
+## calculate average number of steps
+
+timeseries <- tapply(newdata$steps, list(data$interval, days), mean, na.rm = TRUE)
+dftimeseries <- data.frame(timeseries)
+par(mfrow = c(2, 1))
+plot(row.names(dftimeseries), dftimeseries$weekday, type = "l", xlab = "intervals", 
+    ylab = "steps", main = "weekday")
+plot(row.names(dftimeseries), dftimeseries$weekend, type = "l", xlab = "intervals", 
+    ylab = "steps", main = "weekend")
+```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12.png) 
+
